@@ -3,6 +3,15 @@
     --primary-color--dark: #808080;
     --alarm-color: #f80000;
 
+    --indicator-one-color: #0200fc;
+    --indicator-two-color: #017e00;
+    --indicator-three-color: #ff0000;
+    --indicator-four-color: #010080;
+    --indicator-five-color: #7f0300;
+    --indicator-six-color: #008080;
+    --indicator-seven-color: #000000;
+    --indicator-eight-color: #808080;
+
     --cell-size: 4rem;
     --game-padding: 1.5rem;
     --border-width: 0.3rem;
@@ -166,6 +175,10 @@ html {
     background-size: 2rem;
     background-position: center;
     background-repeat: no-repeat;
+    font-size: 2.4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .cell--is-flagged {
@@ -176,6 +189,32 @@ html {
     background-image: url('../assets/bomb.svg');
     background-color: var(--alarm-color);
 }
+
+.cell-indicator-1 {
+    color: var(--indicator-one-color);
+}
+.cell-indicator-2 {
+    color: var(--indicator-two-color);
+}
+.cell-indicator-3 {
+    color: var(--indicator-three-color);
+}
+.cell-indicator-4 {
+    color: var(--indicator-four-color);
+}
+.cell-indicator-5 {
+    color: var(--indicator-five-color);
+}
+.cell-indicator-6 {
+    color: var(--indicator-six-color);
+}
+.cell-indicator-7 {
+    color: var(--indicator-seven-color);
+}
+.cell-indicator-8 {
+    color: var(--indicator-eight-color);
+}
+
 
 .hide {
     visibility: hidden;
