@@ -2,6 +2,8 @@
     --primary-color: #c0c0c0;
     --primary-color--dark: #808080;
     --alarm-color: #f80000;
+    --background-color: #1a1a1a;
+    --container-padding: 2rem;
 
     --indicator-one-color: #0200fc;
     --indicator-two-color: #017e00;
@@ -36,6 +38,12 @@
 body {
     font-family: 'Lato', sans-serif;
     box-sizing: border-box;
+    background-color: var(--background-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--container-padding);
 }
 
 html {
@@ -46,8 +54,9 @@ html {
     background-color: var(--primary-color);
     padding: var(--game-padding);
     max-width: var(--game-max-width);
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
 }
 
 .game__board {
@@ -113,42 +122,73 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
 }
 
 .modal__content {
     width: 50vw;
-    height: 50vh;
-    background-color: #fff;
+    min-height: 60vh;
+    background-color: var(--primary-color);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
+    padding: 3rem;
+    border: var(--border-width) solid;
+    border-color: #fff var(--primary-color--dark) var(--primary-color--dark) #fff;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    animation: modalAppear 0.3s ease-out;
 }
 
 .modal__text {
     font-size: 4.8rem;
     text-align: center;
+    color: #000;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+    font-weight: bold;
 }
 
 .modal__button {
     cursor: pointer;
-    background-color: transparent;
+    background-color: var(--primary-color);
     color: #000;
-    border: 0.3rem solid #000;
-    padding: 1rem 2rem;
+    border: var(--border-width) solid;
+    border-color: #fff var(--primary-color--dark) var(--primary-color--dark) #fff;
+    padding: 1.5rem 3rem;
     font-size: 2.4rem;
     outline: none;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background-color 0.1s ease-in, color 0.1s ease-in, border-color 0.1s ease-in;
+    transition: transform 0.1s ease-out, background-color 0.1s ease-out, color 0.1s ease-out, border-color 0.1s ease-out;
+    text-transform: uppercase;
+    font-weight: bold;
+    min-width: 20rem;
+    margin-top: 2rem;
 }
 
 .modal__button:hover {
-    background-color: #000;
+    background-color: var(--primary-color--dark);
     color: #fff;
-    border-color: #000;
+    transform: translateY(-2px);
+}
+
+.modal__button:active {
+    border-color: var(--primary-color--dark) #fff #fff var(--primary-color--dark);
+    transform: translateY(0);
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .border {
@@ -218,4 +258,108 @@ html {
 
 .hide {
     visibility: hidden;
+}
+
+@media screen and (max-width: 768px) {
+    :root {
+        --cell-size: 3.5rem;
+        --game-padding: 1rem;
+    }
+
+    html {
+        font-size: 56.25%; /* 9px */
+    }
+
+    .header__counter {
+        font-size: 2.8rem;
+        min-width: 8rem;
+    }
+
+    .header__button {
+        width: 4rem;
+        height: 4rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    :root {
+        --cell-size: 3rem;
+        --game-padding: 0.8rem;
+    }
+
+    html {
+        font-size: 50%; /* 8px */
+    }
+
+    .header__counter {
+        font-size: 2.4rem;
+        min-width: 7rem;
+    }
+
+    .header__button {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
+    .modal__content {
+        width: 90vw;
+        height: 40vh;
+        padding: 2rem;
+    }
+
+    .modal__text {
+        font-size: 3.6rem;
+    }
+
+    .modal__button {
+        padding: 1rem 2rem;
+        font-size: 2rem;
+        min-width: 16rem;
+    }
+}
+
+.modal__scores {
+    width: 100%;
+    margin: 2rem 0;
+    max-height: 30rem;
+    min-height: 15rem;
+    overflow-y: auto;
+    border: 0.2rem solid var(--primary-color--dark);
+}
+
+.modal__scores-title {
+    font-size: 2.4rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    position: sticky;
+    top: 0;
+    background-color: var(--primary-color);
+    padding: 0.5rem;
+    z-index: 1;
+}
+
+.modal__scores-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    font-size: 2rem;
+}
+
+.modal__scores-table th,
+.modal__scores-table td {
+    padding: 1.2rem;
+    text-align: center;
+    border: 0.2rem solid var(--primary-color--dark);
+}
+
+.modal__scores-table th {
+    background-color: var(--primary-color--dark);
+    color: #fff;
+    position: sticky;
+    top: 4rem;
+    z-index: 1;
+}
+
+.modal__scores-table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.05);
 }

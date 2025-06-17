@@ -10,17 +10,20 @@ class Game extends UI {
         easy: {
             rows: 8,
             cols: 8,
-            mines: 10
+            mines: 10,
+            key: 'easy_scores'
         },
         normal: {
             rows: 16,
             cols: 16,
-            mines: 40
+            mines: 40,
+            key: 'normal_scores'
         },
         expert: {
             rows: 16,
             cols: 30,
-            mines: 99
+            mines: 99,
+            key: 'expert_scores'
         }
     }
 
@@ -51,6 +54,8 @@ class Game extends UI {
         this.#handleElements();
         this.#counter.init();
         this.#timer.init();
+        this.#modal.init();
+        this.#modal.onPlayAgain = () => this.#handleNewGameClick();
         this.#addButtonsEventListeners();
         this.#newGame()
     }
@@ -83,12 +88,15 @@ class Game extends UI {
         this.#revealedCells = 0;
 
         this.#addCellsEventListeners();
+        
+        // Show high scores for current difficulty
+        this.#showHighScores();
     }
 
     #endGame(isWin) {
         this.#isGameFinished = true;
         this.#timer.stoptTimer();
-        this.#modal.buttonText = 'Close';
+        this.#modal.buttonText = 'Play again!';
 
         if(!isWin) {
             this.#revealMines();
@@ -99,27 +107,98 @@ class Game extends UI {
             return;
         }
 
-        this.#modal.infoText = this.#timer.numberOfSeconds < this.#timer.maxNumberOfSeconds
-            ? `You won, it took you ${this.#timer.numberOfSeconds} seconds, congratulations!`
+        const currentTime = this.#timer.numberOfSeconds;
+        console.log('Game won with time:', currentTime);
+        this.#saveScore(currentTime);
+        this.#showHighScores();
+
+        this.#modal.infoText = currentTime < this.#timer.maxNumberOfSeconds
+            ? `You won, it took you ${currentTime} seconds, congratulations!`
             : 'You won, congratulations';
         this.#buttons.reset.changeEmotion('happy');
         this.#modal.setText();
         this.#modal.toggleModal();
     }
 
+    #saveScore(time) {
+        try {
+            const difficulty = this.#getCurrentDifficulty();
+            const scores = this.#getScores(difficulty.key);
+            scores.push(time);
+            scores.sort((a, b) => a - b);
+            scores.splice(5); // Keep only top 5 scores
+            const scoresString = JSON.stringify(scores);
+            localStorage.setItem(difficulty.key, scoresString);
+            console.log(`Saved score ${time} for ${difficulty.key}:`, scores);
+        } catch (error) {
+            console.error('Error saving score:', error);
+        }
+    }
+
+    #getScores(key) {
+        try {
+            const scoresString = localStorage.getItem(key);
+            if (!scoresString) {
+                console.log(`No scores found for ${key}`);
+                return [];
+            }
+            const scores = JSON.parse(scoresString);
+            console.log(`Retrieved scores for ${key}:`, scores);
+            return Array.isArray(scores) ? scores : [];
+        } catch (error) {
+            console.error('Error getting scores:', error);
+            return [];
+        }
+    }
+
+    #showHighScores() {
+        try {
+            const difficulty = this.#getCurrentDifficulty();
+            const scores = this.#getScores(difficulty.key);
+            console.log(`Showing scores for ${difficulty.key}:`, scores);
+            if (this.#modal && this.#modal.updateScoresTable) {
+                this.#modal.updateScoresTable(scores);
+            }
+        } catch (error) {
+            console.error('Error showing high scores:', error);
+        }
+    }
+
+    #getCurrentDifficulty() {
+        if (this.#numberOfRows === this.#config.easy.rows && 
+            this.#numberOfCols === this.#config.easy.cols) {
+            return this.#config.easy;
+        } else if (this.#numberOfRows === this.#config.normal.rows && 
+                   this.#numberOfCols === this.#config.normal.cols) {
+            return this.#config.normal;
+        } else {
+            return this.#config.expert;
+        }
+    }
+
     #handleElements() {
-        this.#board = this.getElement(this.UISelectors.board);
-        this.#buttons.modal = this.getElement(this.UISelectors.modalButton);
-        this.#buttons.easy = this.getElement(this.UISelectors.easyButton);
-        this.#buttons.normal = this.getElement(this.UISelectors.normalButton);
-        this.#buttons.expert = this.getElement(this.UISelectors.expertButton);
+        try {
+            this.#board = this.getElement(this.UISelectors.board);
+            this.#buttons.modal = this.getElement(this.UISelectors.modalButton);
+            this.#buttons.easy = this.getElement(this.UISelectors.easyButton);
+            this.#buttons.normal = this.getElement(this.UISelectors.normalButton);
+            this.#buttons.expert = this.getElement(this.UISelectors.expertButton);
+        } catch (error) {
+            console.error('Error initializing game elements:', error);
+            throw new Error('Failed to initialize game elements');
+        }
     }
 
     #addCellsEventListeners() {
-        this.#cellsElements.forEach((element) => {
-            element.addEventListener('click', this.#handleCellClick);
-            element.addEventListener('contextmenu', this.#handleCellContextMenu);
-        })
+        try {
+            this.#cellsElements.forEach((element) => {
+                element.addEventListener('click', this.#handleCellClick);
+                element.addEventListener('contextmenu', this.#handleCellContextMenu);
+            });
+        } catch (error) {
+            console.error('Error adding cell event listeners:', error);
+            throw new Error('Failed to add cell event listeners');
+        }
     }
 
     #removeCellsEventListeners() {
@@ -195,13 +274,18 @@ class Game extends UI {
     }
 
     #renderBoard() {
-        while(this.#board.firstChild) {
-            this.#board.removeChild(this.#board.lastChild);
+        try {
+            while(this.#board.firstChild) {
+                this.#board.removeChild(this.#board.lastChild);
+            }
+            this.#cells.flat().forEach((cell) => {
+               this.#board.insertAdjacentHTML('beforeend', cell.createElement());
+               cell.element = cell.getElement(cell.selector);
+            });
+        } catch (error) {
+            console.error('Error rendering game board:', error);
+            throw new Error('Failed to render game board');
         }
-        this.#cells.flat().forEach((cell) => {
-           this.#board.insertAdjacentHTML('beforeend', cell.createElement());
-           cell.element = cell.getElement(cell.selector);
-        });
     }
 
     #handleCellClick = (event) => {
@@ -238,9 +322,12 @@ class Game extends UI {
 
     #clickCell(cell) {
         if(this.#isGameFinished || cell.isFlagged) return;
+        
         if(cell.isMine) {
             this.#endGame(false);
+            return;
         }
+
         this.#setCellValue(cell);
 
         if(this.#revealedCells === this.#cellsToReveal && !this.#isGameFinished) {

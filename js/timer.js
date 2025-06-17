@@ -7,7 +7,7 @@ export class Timer extends UI {
     maxNumberOfSeconds = 999;
 
     init() {
-        this.#element = this.getElement(this.UISelectors.timer);
+        this.#element = document.querySelector('[data-timer]');
     }
 
     #startTimer() {
@@ -20,7 +20,7 @@ export class Timer extends UI {
 
     resetTimer() {
         this.numberOfSeconds = 0;
-        this.#setTimerValue(this.numberOfSeconds);
+        this.#element.textContent = this.numberOfSeconds;
         this.stoptTimer();
         this.#startTimer();
     }
@@ -28,12 +28,10 @@ export class Timer extends UI {
     #updateTimer() {
         this.numberOfSeconds++;
 
-        this.numberOfSeconds <= this.maxNumberOfSeconds
-            ? this.#setTimerValue(this.numberOfSeconds)
-            : this.stoptTimer();
-    }
-
-    #setTimerValue(value) {
-        this.#element.textContent = value;
+        if (this.numberOfSeconds <= this.maxNumberOfSeconds) {
+            this.#element.textContent = this.numberOfSeconds;
+        } else {
+            this.stoptTimer();
+        }
     }
 }
