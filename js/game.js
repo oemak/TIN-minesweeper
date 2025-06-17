@@ -89,7 +89,6 @@ class Game extends UI {
 
         this.#addCellsEventListeners();
         
-        // Show high scores for current difficulty
         this.#showHighScores();
     }
 
@@ -126,7 +125,7 @@ class Game extends UI {
             const scores = this.#getScores(difficulty.key);
             scores.push(time);
             scores.sort((a, b) => a - b);
-            scores.splice(5); // Keep only top 5 scores
+            scores.splice(5);
             const scoresString = JSON.stringify(scores);
             localStorage.setItem(difficulty.key, scoresString);
             console.log(`Saved score ${time} for ${difficulty.key}:`, scores);
